@@ -187,10 +187,32 @@ return "Señor amado, hoy recibo esta palabra en medio de mis "+tema+". "+
 /* CARGAR VERSÍCULO AUTOMÁTICO */
 async function cargarVersiculo(){
 
-slides.innerHTML="<div class='slide'><div class='card'>Cargando...</div></div>";
+slides.innerHTML="<div class='slide'><div class='card'>Cargando versículo...</div></div>";
 
-const res=await fetch("https://bible-api.com/?random=verse&translation=rvr1960");
-const data=await res.json();
+try{
+
+// Generador simple de referencias comunes
+const libros = [
+"Juan 3:16",
+"Salmos 23:1",
+"Romanos 8:28",
+"Isaías 41:10",
+"Filipenses 4:13",
+"Mateo 11:28",
+"Proverbios 3:5",
+"Jeremías 29:11",
+"2 Corintios 5:7",
+"Hebreos 11:1"
+];
+
+let referenciaRandom = libros[Math.floor(Math.random()*libros.length)];
+
+const res = await fetch(`https://bible-api.com/${encodeURIComponent(referenciaRandom)}?translation=rvr1960`);
+const data = await res.json();
+
+if(!data.text){
+throw new Error("Sin texto");
+}
 
 let exp=generarExplicacion(data.text);
 let ora=generarOracion(data.text);
@@ -214,22 +236,19 @@ slides.innerHTML=`
 </div>
 `;
 
-index=0;
-actualizar();
+} catch (error){
+
+slides.innerHTML=`
+<div class="slide">
+<div class="card">
+<p>No se pudo cargar el versículo.</p>
+<div class="referencia">Revisa conexión o API</div>
+</div>
+</div>
+`;
+
 }
 
-function actualizar(){
-slides.style.transform=`translateX(-${index*100}%)`;
-}
-
-function mostrarExp(){
-document.getElementById("exp").style.display="block";
-document.getElementById("ora").style.display="none";
-}
-
-function mostrarOra(){
-document.getElementById("ora").style.display="block";
-document.getElementById("exp").style.display="none";
 }
 
 /* SLIDE TACTIL */
@@ -266,4 +285,5 @@ cargarVersiculo();
 </script>
 
 </body>
+
 </html>
