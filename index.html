@@ -191,6 +191,55 @@ slides.innerHTML="<div class='slide'><div class='card'>Cargando versículo...</d
 
 try{
 
+const res = await fetch("https://labs.bible.org/api/?passage=random&type=json");
+const data = await res.json();
+
+if(!data || !data[0] || !data[0].text){
+throw new Error("Sin datos");
+}
+
+const texto = data[0].text;
+const referencia = data[0].bookname + " " + data[0].chapter + ":" + data[0].verse;
+
+let exp = generarExplicacion(texto);
+let ora = generarOracion(texto);
+
+slides.innerHTML=`
+<div class="slide">
+<div class="card">
+<p>"${texto}"</p>
+<div class="referencia">~ ${referencia}</div>
+
+<div class="botones">
+<button class="btn-exp" onclick="mostrarExp()">✨ Explícame</button>
+<button class="btn-ora" onclick="mostrarOra()">🙏 Mi Oración</button>
+<button class="btn-nuevo" onclick="cargarVersiculo()">🌿 Otro Versículo</button>
+</div>
+
+<div id="exp" class="extra" style="display:none">${exp}</div>
+<div id="ora" class="extra" style="display:none">${ora}</div>
+
+</div>
+</div>
+`;
+
+index=0;
+actualizar();
+
+}catch(error){
+
+slides.innerHTML=`
+<div class="slide">
+<div class="card">
+<p>Error al cargar versículo.</p>
+<div class="referencia">Revisa conexión</div>
+</div>
+</div>
+`;
+
+}
+
+}
 // Generador simple de referencias comunes
 const libros = [
 "Juan 3:16",
@@ -287,4 +336,5 @@ cargarVersiculo();
 </body>
 
 </html>
+
 
