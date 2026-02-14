@@ -207,7 +207,7 @@ const libros = [
 
 let referenciaRandom = libros[Math.floor(Math.random()*libros.length)];
 
-const res = await fetch(`https://bible-api.com/${encodeURIComponent(referenciaRandom)}?translation=rvr1960`);
+const res = await fetch(`https://biblebytopic.com/api/getrandompopularverse-kjv{encodeURIComponent(referenciaRandom)}?translation=rvr1960`);
 const data = await res.json();
 
 if(!data.text){
@@ -287,3 +287,4 @@ cargarVersiculo();
 </body>
 
 </html>
+
