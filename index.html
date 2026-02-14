@@ -15,7 +15,6 @@ min-height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
-overflow:hidden;
 }
 
 .app{
@@ -25,32 +24,11 @@ text-align:center;
 }
 
 h1{
-font-size:2.2em;
-margin-bottom:25px;
+font-size:2em;
+margin-bottom:20px;
 background:linear-gradient(45deg,#8e2de2,#4a00e0);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
-animation:brillo 3s infinite alternate;
-}
-
-@keyframes brillo{
-from{opacity:0.7;}
-to{opacity:1;}
-}
-
-.slider{
-overflow:hidden;
-position:relative;
-}
-
-.slides{
-display:flex;
-transition:transform 0.6s ease;
-}
-
-.slide{
-min-width:100%;
-padding:25px;
 }
 
 .card{
@@ -58,13 +36,10 @@ background:white;
 border-radius:20px;
 padding:30px;
 box-shadow:0 10px 30px rgba(0,0,0,0.15);
-position:relative;
-animation:fade 0.8s ease;
 }
 
 .card p{
 font-size:1.1em;
-color:#444;
 margin-bottom:10px;
 white-space:pre-line;
 }
@@ -72,11 +47,7 @@ white-space:pre-line;
 .referencia{
 color:#ff6ec4;
 font-weight:bold;
-font-size:0.9em;
-}
-
-.botones{
-margin-top:20px;
+margin-bottom:15px;
 }
 
 button{
@@ -102,131 +73,87 @@ transform:scale(1.08);
 margin-top:15px;
 font-size:0.95em;
 color:#555;
-animation:fade 0.7s ease;
+display:none;
 }
 
-@keyframes fade{
-from{opacity:0;transform:translateY(10px);}
-to{opacity:1;transform:translateY(0);}
-}
 </style>
 </head>
 <body>
 
 <div class="app">
 <h1>✨ La Palabra de Dios ✨</h1>
-<div class="slider">
-<div class="slides" id="slides"></div>
+
+<div class="card">
+<p id="versiculo">Cargando versículo...</p>
+<div class="referencia" id="referencia"></div>
+
+<button class="btn-exp" onclick="mostrar('exp')">✨ Explícame</button>
+<button class="btn-ora" onclick="mostrar('ora')">🙏 Mi Oración</button>
+<button class="btn-nuevo" onclick="cargarVersiculo()">🌿 Otro Versículo</button>
+
+<div id="exp" class="extra"></div>
+<div id="ora" class="extra"></div>
+
 </div>
 </div>
 
 <script>
 
-const slides=document.getElementById("slides");
-
-/* LISTA DE LIBROS PARA RANDOM REAL */
-const libros=[
-"juan","salmos","proverbios","romanos","isaias",
-"jeremias","mateo","lucas","hechos","filipenses",
-"efesios","hebreos","santiago"
-];
-
-function randomLibro(){
-return libros[Math.floor(Math.random()*libros.length)];
-}
-
-/* ANALISIS INTELIGENTE MEJORADO */
 function analizarTema(texto){
 texto=texto.toLowerCase();
 
-if(texto.includes("miedo")||texto.includes("temas"))
-return "momentos de miedo e inseguridad";
+if(texto.includes("fear")||texto.includes("afraid"))
+return "miedo e inseguridad";
 
-if(texto.includes("fortaleza")||texto.includes("fuerza"))
-return "debilidad y necesidad de fortaleza";
+if(texto.includes("love"))
+return "amor y relaciones";
 
-if(texto.includes("amor"))
-return "relaciones, perdón y amor";
+if(texto.includes("peace"))
+return "ansiedad e inquietud";
 
-if(texto.includes("esperanza"))
-return "tiempos difíciles donde necesitas esperanza";
+if(texto.includes("strength"))
+return "debilidad o cansancio";
 
-if(texto.includes("paz"))
-return "ansiedad o inquietud interior";
-
-return "procesos personales donde necesitas dirección espiritual";
+return "procesos personales y decisiones importantes";
 }
 
 function generarExplicacion(texto){
 let tema=analizarTema(texto);
-
-return `Este versículo está profundamente conectado con ${tema}. 
-No es solo una frase antigua, sino una guía espiritual para situaciones reales como problemas familiares, decisiones importantes o luchas internas.
-Dios usa esta palabra para recordarte que Él sigue obrando incluso cuando no ves resultados inmediatos.
-Es una invitación a confiar, obedecer y caminar con fe aunque el panorama no sea claro.`;
+return `Este versículo se relaciona con ${tema}. 
+Dios usa esta palabra para fortalecer tu corazón y recordarte que no estás solo en lo que atraviesas. 
+Es una invitación a confiar incluso cuando no entiendes el proceso.`;
 }
 
 function generarOracion(texto){
 let tema=analizarTema(texto);
-
-return `Señor amado, recibo esta palabra en medio de ${tema}.
-Si mi corazón está inquieto, dame paz.
-Si estoy débil, sé mi fuerza.
-Si tengo dudas, aumenta mi fe.
-Guía mis pasos y ayúdame a confiar en tus planes.
-Transforma mi temor en valentía y mi ansiedad en esperanza. Amén.`;
+return `Señor, en medio de mis ${tema}, recibo esta palabra con fe. 
+Dame paz, sabiduría y fortaleza. 
+Guía mis pasos y transforma mi corazón conforme a tu voluntad. Amén.`;
 }
 
 async function cargarVersiculo(){
 
-slides.innerHTML="<div class='slide'><div class='card'>Cargando...</div></div>";
+document.getElementById("versiculo").innerText="Cargando versículo...";
+document.getElementById("referencia").innerText="";
+document.getElementById("exp").style.display="none";
+document.getElementById("ora").style.display="none";
 
 try{
 
-let libro=randomLibro();
-let cap=Math.floor(Math.random()*20)+1;
-
-const res=await fetch(`https://bible-api.com/${libro}+${cap}:1?translation=rvr1960`);
-
-if(!res.ok) throw new Error("Error API");
-
+const res=await fetch("https://labs.bible.org/api/?passage=random&type=json");
 const data=await res.json();
 
-let texto=data.text.trim();
+let texto=data[0].text;
+let referencia=`${data[0].bookname} ${data[0].chapter}:${data[0].verse}`;
 
-let exp=generarExplicacion(texto);
-let ora=generarOracion(texto);
+document.getElementById("versiculo").innerText=`"${texto}"`;
+document.getElementById("referencia").innerText=referencia;
 
-slides.innerHTML=`
-<div class="slide">
-<div class="card">
-<p>"${texto}"</p>
-<div class="referencia">~ ${data.reference}</div>
-
-<div class="botones">
-<button class="btn-exp" onclick="mostrar('exp')">✨ Explícame</button>
-<button class="btn-ora" onclick="mostrar('ora')">🙏 Mi Oración</button>
-<button class="btn-nuevo" onclick="cargarVersiculo()">🌿 Otro Versículo</button>
-</div>
-
-<div id="exp" class="extra" style="display:none">${exp}</div>
-<div id="ora" class="extra" style="display:none">${ora}</div>
-
-</div>
-</div>
-`;
+document.getElementById("exp").innerText=generarExplicacion(texto);
+document.getElementById("ora").innerText=generarOracion(texto);
 
 }catch(error){
-
-slides.innerHTML=`
-<div class="slide">
-<div class="card">
-<p>No se pudo cargar el versículo.</p>
-<button class="btn-nuevo" onclick="cargarVersiculo()">Intentar nuevamente</button>
-</div>
-</div>
-`;
-
+document.getElementById("versiculo").innerText="No se pudo cargar el versículo. Revisa tu conexión.";
 }
 
 }
