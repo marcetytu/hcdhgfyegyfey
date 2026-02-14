@@ -99,20 +99,34 @@ display:none;
 
 <script>
 
+const libros=[
+"Génesis","Éxodo","Salmos","Proverbios","Isaías",
+"Jeremías","Mateo","Lucas","Juan","Romanos",
+"Filipenses","Efesios","Hebreos","Santiago"
+];
+
+function randomLibro(){
+return libros[Math.floor(Math.random()*libros.length)];
+}
+
+function randomCapitulo(){
+return Math.floor(Math.random()*20)+1;
+}
+
 function analizarTema(texto){
 texto=texto.toLowerCase();
 
-if(texto.includes("fear")||texto.includes("afraid"))
-return "miedo e inseguridad";
+if(texto.includes("temor")||texto.includes("no temas"))
+return "momentos de miedo e inseguridad";
 
-if(texto.includes("love"))
-return "amor y relaciones";
+if(texto.includes("fortaleza")||texto.includes("fuerza"))
+return "debilidad y falta de ánimo";
 
-if(texto.includes("peace"))
-return "ansiedad e inquietud";
+if(texto.includes("amor"))
+return "relaciones y perdón";
 
-if(texto.includes("strength"))
-return "debilidad o cansancio";
+if(texto.includes("paz"))
+return "ansiedad o inquietud interior";
 
 return "procesos personales y decisiones importantes";
 }
@@ -120,15 +134,16 @@ return "procesos personales y decisiones importantes";
 function generarExplicacion(texto){
 let tema=analizarTema(texto);
 return `Este versículo se relaciona con ${tema}. 
-Dios usa esta palabra para fortalecer tu corazón y recordarte que no estás solo en lo que atraviesas. 
-Es una invitación a confiar incluso cuando no entiendes el proceso.`;
+Dios usa esta palabra para recordarte que no estás solo en lo que atraviesas.
+Es una guía espiritual para tu vida diaria, tus decisiones y tus emociones.`;
 }
 
 function generarOracion(texto){
 let tema=analizarTema(texto);
-return `Señor, en medio de mis ${tema}, recibo esta palabra con fe. 
-Dame paz, sabiduría y fortaleza. 
-Guía mis pasos y transforma mi corazón conforme a tu voluntad. Amén.`;
+return `Señor amado, en medio de mis ${tema}, recibo esta palabra.
+Dame paz, sabiduría y fortaleza.
+Ayúdame a confiar en Ti en todo momento.
+Transforma mi corazón y guía mis pasos. Amén.`;
 }
 
 async function cargarVersiculo(){
@@ -140,11 +155,17 @@ document.getElementById("ora").style.display="none";
 
 try{
 
-const res=await fetch("https://labs.bible.org/api/?passage=random&type=json");
+let libro=randomLibro();
+let cap=randomCapitulo();
+
+const res=await fetch(`https://bible-api.com/${libro}+${cap}:1?translation=rvr1960`);
+
+if(!res.ok) throw new Error("Error API");
+
 const data=await res.json();
 
-let texto=data[0].text;
-let referencia=`${data[0].bookname} ${data[0].chapter}:${data[0].verse}`;
+let texto=data.text.trim();
+let referencia=data.reference;
 
 document.getElementById("versiculo").innerText=`"${texto}"`;
 document.getElementById("referencia").innerText=referencia;
@@ -153,7 +174,8 @@ document.getElementById("exp").innerText=generarExplicacion(texto);
 document.getElementById("ora").innerText=generarOracion(texto);
 
 }catch(error){
-document.getElementById("versiculo").innerText="No se pudo cargar el versículo. Revisa tu conexión.";
+
+document.getElementById("versiculo").innerText="No se pudo cargar el versículo. Intenta nuevamente.";
 }
 
 }
