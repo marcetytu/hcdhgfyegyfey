@@ -15,10 +15,13 @@ min-height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
-overflow:hidden;
 }
 
-.app{width:95%;max-width:700px;text-align:center;}
+.app{
+width:95%;
+max-width:700px;
+text-align:center;
+}
 
 h1{
 font-size:2em;
@@ -62,7 +65,9 @@ transition:0.3s;
 .btn-ora{background:linear-gradient(45deg,#7873f5,#4facfe);}
 .btn-nuevo{background:linear-gradient(45deg,#43e97b,#38f9d7);}
 
-button:hover{transform:scale(1.08);}
+button:hover{
+transform:scale(1.08);
+}
 
 .extra{
 margin-top:15px;
@@ -70,7 +75,6 @@ font-size:0.95em;
 color:#555;
 display:none;
 }
-
 </style>
 </head>
 <body>
@@ -94,44 +98,45 @@ display:none;
 
 <script>
 
-/* Detecta el tema del versículo */
 function analizarTema(texto){
 texto=texto.toLowerCase();
 if(texto.includes("temor")||texto.includes("no temas")) return "miedo e inseguridad";
 if(texto.includes("amor")) return "amor y relaciones";
-if(texto.includes("paz")) return "ansiedad e inquietud interior";
-if(texto.includes("fuerza")||texto.includes("fortaleza")) return "debilidad y necesidad de fortaleza";
-return "procesos personales y decisiones importantes";
+if(texto.includes("paz")) return "ansiedad e inquietud";
+if(texto.includes("fortaleza")||texto.includes("fuerza")) return "debilidad o cansancio";
+return "momentos de crecimiento y decisiones importantes";
 }
 
-/* Genera explicación automática */
 function generarExplicacion(texto){
 let tema=analizarTema(texto);
-return `Este versículo se relaciona con ${tema}. La Biblia no es solo un texto antiguo: es guía para tu vida actual. 
-Dios nos habla a través de Su Palabra en momentos de dificultad, decisiones, desafíos y alegrías, recordándonos que Su amor y dirección están siempre disponibles para ti.`;
+return `Este versículo se aplica a ${tema}. 
+Dios usa Su Palabra para recordarte que no estás solo.
+Es una guía espiritual para tu vida diaria y tus decisiones.`;
 }
 
-/* Genera oración automática */
 function generarOracion(texto){
 let tema=analizarTema(texto);
-return `Señor Dios, en medio de mis ${tema}, recibo esta palabra con fe. 
-Dame paz, fortaleza y sabiduría para cada día. 
-Guía mi corazón y transforma mis pensamientos para que confíe plenamente en Ti. Amén.`;
+return `Señor, en medio de ${tema}, recibo esta palabra.
+Fortalece mi fe, dame paz y guía mis pasos.
+Confío en que Tú estás obrando en mi vida. Amén.`;
 }
 
-/* Carga versículo desde API en español */
 async function cargarVersiculo(){
+
 document.getElementById("versiculo").innerText="Cargando versículo...";
 document.getElementById("referencia").innerText="";
 document.getElementById("exp").style.display="none";
 document.getElementById("ora").style.display="none";
 
 try{
-const res=await fetch("https://beta.ourmanna.com/api/v1/get/?format=json&order=random&language=es");
+
+let proxy="https://ancient-sound-e467.jsjsjsjsjdjxyd6sbsvd.workers.dev/"; // 👈 AQUÍ PEGAS TU URL
+
+const res=await fetch(proxy);
 const data=await res.json();
 
-let texto=data.verse.details.text;
-let referencia=data.verse.details.reference;
+let texto=data.texto.trim();
+let referencia=data.referencia;
 
 document.getElementById("versiculo").innerText=`"${texto}"`;
 document.getElementById("referencia").innerText=referencia;
@@ -140,19 +145,17 @@ document.getElementById("exp").innerText=generarExplicacion(texto);
 document.getElementById("ora").innerText=generarOracion(texto);
 
 }catch(error){
-document.getElementById("versiculo").innerText="No se pudo cargar el versículo. Revisa tu conexión.";
-document.getElementById("referencia").innerText="";
-}
+document.getElementById("versiculo").innerText="No se pudo cargar el versículo. Intenta nuevamente.";
 }
 
-/* Muestra explicación u oración */
+}
+
 function mostrar(id){
 document.getElementById("exp").style.display="none";
 document.getElementById("ora").style.display="none";
 document.getElementById(id).style.display="block";
 }
 
-/* Ejecuta la primera vez */
 cargarVersiculo();
 
 </script>
